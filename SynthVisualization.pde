@@ -1,5 +1,7 @@
 import processing.sound.*;
 
+float randW, randS;
+
 int cont = 300;
 int cont1 = 299;
 
@@ -9,6 +11,9 @@ FFT fft;
 AudioIn in;
 int bands = 4;
 float[] spectrum = new float[bands];
+color[] colors = new color[bands];
+float[] randA = new float[bands];
+float[] randB = new float[bands];
 
 void setup() {
   size(1280, 720);
@@ -19,34 +24,41 @@ void setup() {
   
   in.start();
   fft.input(in);
+  
+  colors[0] = color(222,111,237);
+  colors[1] = color(189,236,56);
+  colors[2] = color(111,237,224);
+  colors[3] = color(5,255,161);
 }
 
 void mousePressed() {
   if(type == 0) {
     type = 1;
-    rand = random(0,1)*40+5;
+    randA[0] = random(0,1)*40+5;
   } 
   else {
     type = 0;
-    rand = random(0,1)*40+5;
+    randA[0] = random(0,1)*40+5;
   }
 }
-float rand, rand2, rand3, rand4, rand5, rand6, randW, randS;
+
 void draw() {
-//------random clock-------
 
   fft.analyze(spectrum);
+  
   if(cont > cont1){
-    rand = random(60);
-    rand2 = random(60);
-    rand3 = random(60);
-    rand4 = random(1000,500);
-    rand5 = random(1000,500);
-    rand6 = random(1000,500);
+    
+    for(int i = 0; i < bands; i++){
+      randA[i] = random(60);
+      randB[i] = random(1000,500);
+    }
+    
     randW = random(0.003, 0);
     randS = random(0.002, 0.05);
+    
     cont = 0;
     cont1 = floor(random(299, 599));
+    
   } else{
     cont++;  
   }
@@ -55,37 +67,19 @@ void draw() {
   background(0);
   blendMode(SCREEN);
   noFill();
-  
-//-------red Line -------
-  beginShape();
-  for(int w = -20; w < width + 20; w += 5){
-    float micLevel = spectrum[0];
-    strokeWeight(100*micLevel+5);
-    float h = ((rand4*micLevel)+50)*sin(w/(rand)) * pow(abs(sin(w * randW + frameCount * randS)), 5) + height/2;
-    curveVertex(w,h);
-    stroke(222,111,237);
-  }
-  endShape();
-  
-//----blue line---------
-  beginShape();
-  for(int w = -20; w < width + 20; w += 5){
-    float micLevel = spectrum[1];
-    strokeWeight(100*micLevel+10);
-    float h = (rand5*micLevel+60)*sin(w/(rand2)) * pow(abs(sin(w * randW + frameCount * randS)), 5) + height/2;
-    curveVertex(w,h);
-    stroke(189,236,56);
-  }
-  endShape();
-//-----green line-------
-  beginShape();
-  for(int w = -20; w < width + 20; w += 5){
-    float micLevel = spectrum[2];
-    strokeWeight(100*micLevel+5);
-    float h = (rand6*micLevel+50)*sin(w/(rand3)) * pow(abs(sin(w * randW + frameCount * randS)), 5) + height/2;
-    curveVertex(w,h);
-    stroke(111,237,224);
-  }
-  endShape();
 
+  for(int i = 0; i < bands; i++){
+    syneCreator(colors[i], randA[i], randB[i], spectrum[i]);
+  }
+}
+
+void syneCreator(color col, float randA, float randB, float bandLevel){
+  beginShape();
+  for(int w = -20; w < width + 20; w += 5){
+    strokeWeight(100*bandLevel+5);
+    float h = ((randA*bandLevel)+50)*sin(w/(randB)) * pow(abs(sin(w * randW + frameCount * randS)), 5) + height/2;
+    curveVertex(w,h);
+    stroke(col);
+  }
+  endShape();
 }
