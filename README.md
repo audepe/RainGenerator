@@ -12,3 +12,4 @@ Se obtiene el audio del micrófono con el objeto AudioIn de *Processing* y se le
 ## Referencias
 * [Processing Reference](https://processing.org/reference/)
  
+ 
